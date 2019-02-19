@@ -1,5 +1,8 @@
 #include <stdio.h>
-#include <stlib.h>
+#include <stdlib.h>
+
+#define TRUE 1
+#define FALSE 0
 
 struct binary_tree_node
 {
@@ -8,7 +11,7 @@ struct binary_tree_node
 	int data;
 };
 
-void insert(struct binary_tree_node **node int num)
+void insert(struct binary_tree_node **node, int num)
 {
 	if(*node == NULL)
 	{
@@ -21,10 +24,10 @@ void insert(struct binary_tree_node **node int num)
 	else
 	{
 		if(num < (*node) -> data)
-			insert( &((*node -> left_child), num);
+			insert( &((*node) -> left_child), num);
 		
 		else
-			insert( &((*node -> right_child, num);
+			insert( &((*node) -> right_child), num);
 	}
 }
 
@@ -65,4 +68,90 @@ void search(struct binary_tree_node **root, int num, struct binary_tree_node **p
 
 void delete(struct binary_tree_node **root, int num)
 {
+	int found;
+	struct binary_tree_node *parent, *search_node, *next;
+	
+	if(*root == NULL)
+	{
+		printf("Tree is empty\n");
+		return;
+	}
+	
+	parent = search_node = NULL;
+	search(root, num, &parent, &search_node, &found);
+	
+	if(found == FALSE)
+	{
+		printf("Data not found\n");
+		return;
+	}
+	
+	if(search_node -> left_child != NULL && search_node -> right_child != NULL)
+	{
+		parent = search_node;
+		next = search_node -> right_child;
+		
+		while(next -> left_child != NULL)
+		{
+			parent = next;
+			next = next -> left_child;
+		}
+		
+		search_node -> data = next -> data;
+		search_node = next;
+	}
+	
+	if(search_node -> left_child == NULL && search_node -> right_child != NULL)
+	{
+		if(parent -> left_child == search_node)
+			parent -> left_child = search_node -> right_child;
+		
+		else
+			parent -> right_child = search_node -> right_child;
+		
+		free(search_node);
+		return;
+	}
+	
+	if(search_node -> left_child != NULL && search_node -> right_child == NULL)
+	{
+		if(parent -> left_child == search_node)
+			parent -> left_child = search_node -> left_child;
+		
+		else
+			parent -> right_child = search_node -> left_child;
+		
+		free(search_node);
+		return;
+	}
+}
+
+int main(void)
+{
+	struct binary_tree_node *root;
+	int i = 0;
+	int content[] = {11, 9, 13, 8, 10, 12, 14, 15, 7};
+	root = NULL;
+	
+	while(i <= 8)
+	{
+		insert(&root, content[i]);
+		i++;
+	}
+	
+	traverse(root);
+	printf("\n");
+	
+	delete(&root, 10);
+	traverse(root);
+	printf("\n");
+	
+	delete(&root, 14);
+	traverse(root);
+	printf("\n");
+	
+	delete(&root, 13);
+	traverse(root);
+	
+	return 0;
 }
